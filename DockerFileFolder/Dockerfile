@@ -3,7 +3,7 @@ FROM nextcloud
 EXPOSE 80:80/tcp
 
 RUN apt-get update \
-    && apt-get -y install wget imagemagick gnupg2 unzip ffmpeg
+    && apt-get -y install xdebug wget imagemagick gnupg2 unzip ffmpeg
     
 # Enable repo and install dlib
 RUN echo "deb https://repo.delellis.com.ar bullseye bullseye" > /etc/apt/sources.list.d/20-pdlib.list \
