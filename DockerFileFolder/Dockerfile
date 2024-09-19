@@ -1,4 +1,4 @@
-FROM nextcloud
+FROM nextcloud:28.0.9
 
 EXPOSE 80:80/tcp
 
