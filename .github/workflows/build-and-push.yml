@@ -1,28 +1,49 @@
-name: Build and Push Custom Nextcloud Docker Image
+name: Build and Push Docker Image on Nextcloud Release
 
 on:
-  release:
-    types:
-      - published
+  schedule:
+    - cron: '0 0 * * *'  # This runs every day; you can adjust the frequency
 
 jobs:
-  build:
+  check-release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Check latest release of nextcloud/docker
+      id: check_release
+      run: |
+        # Get the latest release tag from the nextcloud/docker GitHub repository
+        LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/nextcloud/docker/releases/latest" | jq -r .tag_name)
+        echo "Latest release is $LATEST_RELEASE"
+        echo "::set-output name=release_tag::$LATEST_RELEASE"
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Compare with previously stored release
+      id: compare_release
+      run: |
+        # Check if the latest release is new (compared to the previous one)
+        if [ -f release_tag.txt ]; then
+          PREVIOUS_RELEASE=$(cat release_tag.txt)
+          if [ "$PREVIOUS_RELEASE" == "${{ steps.check_release.outputs.release_tag }}" ]; then
+            echo "No new release detected."
+            exit 0  # No new release, exit
+          fi
+        fi
+        echo "${{ steps.check_release.outputs.release_tag }}" > release_tag.txt
+        echo "New release detected."
 
-      - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/nextcloud:${{ github.ref_name }} ./DockerFileFolder
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-      - name: Push Docker image to Docker Hub
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/nc-with-ffmpeg-im:latest
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v2
+      with:
+        context: ./DockerFileFolder  # Path to your Dockerfile folder
+        file: ./DockerFileFolder/Dockerfile  # Dockerfile location
+        push: true  # Push the image to Docker Hub after building
+        tags: ${{ secrets.DOCKER_USERNAME }}/nc-with-ffmpeg-im:latest  # Docker Hub repo name and tag
