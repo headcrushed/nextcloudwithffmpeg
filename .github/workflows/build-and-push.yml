@@ -21,7 +21,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/nextcloud:${{ github.ref_name }} ./DockerFileDirectory
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/nextcloud:${{ github.ref_name }} ./DockerFileFolder
 
       - name: Push Docker image to Docker Hub
         run: |
