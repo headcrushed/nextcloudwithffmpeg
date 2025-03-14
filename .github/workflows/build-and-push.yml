@@ -43,7 +43,7 @@ jobs:
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v2
       with:
-        context: ./DockerFileFolder  # Path to your Dockerfile folder
-        file: ./DockerFileFolder/Dockerfile  # Dockerfile location
+        context: /DockerFileFolder  # Path to your Dockerfile folder
+        file: /DockerFileFolder/Dockerfile  # Dockerfile location
         push: true  # Push the image to Docker Hub after building
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/nc-with-ffmpeg-im:latest  # Docker Hub repo name and tag
