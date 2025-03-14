@@ -2,8 +2,8 @@ name: Build and Push Docker Image
 
 on:
   schedule:
-    - cron: '0 0 * * *' # This runs the workflow every hour
-  workflow_dispatch: # Allows manual triggering of the workflow
+    - cron: '0 *0 * * *' 
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -25,25 +25,19 @@ jobs:
       - name: Check for new Nextcloud image
         id: check_nextcloud
         run: |
-          # Pull the latest Nextcloud image
           docker pull nextcloud:latest
-          # Get the image digest
           NEXTCLOUD_IMAGE=$(docker inspect --format='{{index .RepoDigests 0}}' nextcloud:latest)
           echo "NEXTCLOUD_IMAGE=$NEXTCLOUD_IMAGE" >> $GITHUB_ENV
 
       - name: Check for changes
         id: check_changes
         run: |
-          # Check if the digest has changed
-          if [ -f last_digest.txt ]; then
-            LAST_DIGEST=$(cat last_digest.txt)
-          else
-            LAST_DIGEST=""
-          fi
-
-          if [ "$NEXTCLOUD_IMAGE" != "$LAST_DIGEST" ]; then
+          LAST_NEXTCOUD_DIGEST="${{ secrets.LAST_NEXTCLOUD_DIGEST }}"
+          echo "LAST_NEXTCLOUD_DIGEST=$LAST_NEXTCLOUD_DIGEST"
+          
+          if [ "$NEXTCLOUD_IMAGE" != "$LAST_NEXTCLOUD_DIGEST" ]; then
             echo "New Nextcloud image detected."
-            echo "$NEXTCLOUD_IMAGE" > last_digest.txt
+            echo "NEXTCLOUD_IMAGE=$NEXTCLOUD_IMAGE" >> $GITHUB_ENV
             echo "new_nextcloud_image=true" >> $GITHUB_ENV
           else
             echo "No new Nextcloud image."
@@ -55,3 +49,8 @@ jobs:
         run: |
           docker build -t edipdi/nc-with-ffmpeg-im:latest .
           docker push edipdi/nc-with-ffmpeg-im:latest
+
+      - name: Update last digest (store it in a secret, or use GitHub Artifact/Cache)
+        if: env.new_nextcloud_image == 'true'
+        run: |
+          echo "NEXTCLOUD_IMAGE=$NEXTCLOUD_IMAGE" >> $GITHUB_ENV
