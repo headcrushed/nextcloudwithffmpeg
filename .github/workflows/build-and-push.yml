@@ -35,7 +35,12 @@ jobs:
         id: load_digest
         run: |
           echo "Restoring previous digest from cache (if available)"
-          DIGEST_NEXTCLOUD_CACHE=$(cat ${{ github.workspace }}/.nextcloud-digest.txt || echo "")
+          # Check if the file exists and read it; otherwise, set to empty string
+          if [ -f .nextcloud-digest.txt ]; then
+            DIGEST_NEXTCLOUD_CACHE=$(cat .nextcloud-digest.txt)
+          else
+            DIGEST_NEXTCLOUD_CACHE=""
+          fi
           echo "Previous digest: $DIGEST_NEXTCLOUD_CACHE"
           echo "DIGEST_NEXTCLOUD_CACHE=$DIGEST_NEXTCLOUD_CACHE" >> $GITHUB_ENV
 
@@ -52,11 +57,11 @@ jobs:
             echo "new_nextcloud_image=false" >> $GITHUB_ENV
           fi
 
-      - name: Build and push Docker image
-        if: env.new_nextcloud_image == 'true'
-        run: |
-          docker build -t edipdi/nc-with-ffmpeg-im:latest .
-          docker push edipdi/nc-with-ffmpeg-im:latest
+      #- name: Build and push Docker image
+      #  if: env.new_nextcloud_image == 'true'
+      #  run: |
+      #    docker build -t edipdi/nc-with-ffmpeg-im:latest .
+      #    docker push edipdi/nc-with-ffmpeg-im:latest
 
       - name: Cache digest for future runs
         uses: actions/cache@v3
