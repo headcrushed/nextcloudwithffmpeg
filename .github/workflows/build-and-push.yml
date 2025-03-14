@@ -2,7 +2,7 @@ name: Build and Push Docker Image on Nextcloud Release
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # This runs every day; you can adjust the frequency
+    - cron: '25 3 * * *'  # This runs every day; you can adjust the frequency
 
 jobs:
   check-release:
