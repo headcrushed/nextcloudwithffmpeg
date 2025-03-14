@@ -73,7 +73,6 @@ jobs:
           # Push the changes using the GitHub Actions token for authentication
           git push https://x-access-token:${{ secrets.PAT_TOKE }}@github.com/${{ github.repository }} HEAD:main
 
-
       #- name: Build and push Docker image
       #  if: env.new_nextcloud_image == 'true'
       #  run: |
