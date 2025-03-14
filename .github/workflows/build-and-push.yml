@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   schedule:
-    - cron: '0 0 * * *' # This runs the workflow every hour (adjusted from your comment)
+    - cron: '0 * * * *' # This runs the workflow every hour (adjusted from your comment)
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
@@ -35,15 +35,15 @@ jobs:
         id: load_digest
         run: |
           echo "Restoring previous digest from cache (if available)"
-          DIGEST_CACHE=$(cat ${{ github.workspace }}/.nextcloud-digest.txt || echo "")
-          echo "Previous digest: $DIGEST_CACHE"
-          echo "DIGEST_CACHE=$DIGEST_CACHE" >> $GITHUB_ENV
+          DIGEST_NEXTCLOUD_CACHE=$(cat ${{ github.workspace }}/.nextcloud-digest.txt || echo "")
+          echo "Previous digest: $DIGEST_NEXTCLOUD_CACHE"
+          echo "DIGEST_NEXTCLOUD_CACHE=$DIGEST_NEXTCLOUD_CACHE" >> $GITHUB_ENV
 
       - name: Check for changes
         id: check_changes
         run: |
           # Compare the current digest to the previous one
-          if [ "$NEXTCLOUD_IMAGE" != "$DIGEST_CACHE" ]; then
+          if [ "$NEXTCLOUD_IMAGE" != "$DIGEST_NEXTCLOUD_CACHE" ]; then
             echo "New Nextcloud image detected."
             echo "$NEXTCLOUD_IMAGE" > .nextcloud-digest.txt
             echo "new_nextcloud_image=true" >> $GITHUB_ENV
@@ -59,7 +59,7 @@ jobs:
           docker push edipdi/nc-with-ffmpeg-im:latest
 
       - name: Cache digest for future runs
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .nextcloud-digest.txt
           key: nextcloud-digest-${{ runner.os }}
