@@ -44,14 +44,14 @@ jobs:
           if [ "$NEXTCLOUD_IMAGE" != "$LAST_DIGEST" ]; then
             echo "New Nextcloud image detected."
             echo "$NEXTCLOUD_IMAGE" > last_digest.txt
-            echo "new_image=true" >> $GITHUB_ENV
+            echo "new_nextcloud_image=true" >> $GITHUB_ENV
           else
             echo "No new Nextcloud image."
-            echo "new_image=false" >> $GITHUB_ENV
+            echo "new_nextcloud_image=false" >> $GITHUB_ENV
           fi
 
       - name: Build and push Docker image
-        if: env.new_image == 'true'
+        if: env.new_nextcloud_image == 'true'
         run: |
           docker build -t edipdi/nc-with-ffmpeg-im:latest .
           docker push edipdi/nc-with-ffmpeg-im:latest
