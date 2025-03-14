@@ -71,7 +71,7 @@ jobs:
           git commit -m "Update Nextcloud image digest"
           
           # Push the changes using the GitHub Actions token for authentication
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          git push https://x-access-token:${{ secrets.PAT_TOKE }}@github.com/${{ github.repository }} HEAD:main
 
 
       #- name: Build and push Docker image
