@@ -73,8 +73,8 @@ jobs:
           # Push the changes using the GitHub Actions token for authentication
           git push https://x-access-token:${{ secrets.PAT_TOKE }}@github.com/${{ github.repository }} HEAD:main
 
-      #- name: Build and push Docker image
-      #  if: env.new_nextcloud_image == 'true'
-      #  run: |
-      #    docker build -t edipdi/nc-with-ffmpeg-im:latest .
-      #    docker push edipdi/nc-with-ffmpeg-im:latest
+      - name: Build and push Docker image
+        if: env.new_nextcloud_image == 'true'
+        run: |
+          docker build -t edipdi/nc-with-ffmpeg-im:latest .
+          docker push edipdi/nc-with-ffmpeg-im:latest
